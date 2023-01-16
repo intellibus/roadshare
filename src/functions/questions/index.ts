@@ -1,4 +1,3 @@
-import { APIGatewayEvent } from 'aws-lambda';
 import { getGridMetadata, insert, search, updateByQuery, updateByRowId } from 'bigparser';
 import { sendToSQS } from 'common/interop';
 import { eventsJson } from 'common/middleware';
@@ -6,26 +5,9 @@ import util, { HTTPResponse } from 'common/util';
 import qs from 'querystring';
 import twilio from 'twilio';
 import { QuestionsGridModel } from '@/grids/Questions.grid';
+import { APIGatewayEventWithCookies, ColumnMetadata, MessagingWebhookBody } from '@/types/index';
 
 const { TWILIO_AUTH, QUESTIONS_GRID_ID, COMPLETED_QUEUE_URL } = process.env;
-
-// const client = twilio(TWILIO_SID, TWILIO_AUTH);
-
-interface APIGatewayEventWithCookies extends APIGatewayEvent {
-	cookies: string[];
-}
-
-type MessagingWebhookBody = {
-	MessageSid: string;
-	Body: string;
-	From: string;
-	To: string;
-};
-
-type ColumnMetadata = {
-	columnName: string;
-	columnDesc: string;
-};
 
 const CONVERSATION_RESET_PHRASES = ['reset', 'find me a ride'];
 
@@ -103,23 +85,21 @@ const getQuestions = async () => {
 		return { data: null, error: metadataRequestError };
 	}
 	return {
-		data: metadata.columns
-			.filter(
-				(column: ColumnMetadata) =>
-					!column.columnDesc.toLowerCase().includes('skip') &&
-					!['Phone #', 'Complete'].includes(column.columnName)
-			)
-			.map((column: ColumnMetadata) => column.columnName),
+		data: metadata.columns.filter(
+			(column: ColumnMetadata) =>
+				!column.columnDesc.toLowerCase().includes('skip') &&
+				!['Phone #', 'Complete'].includes(column.columnName)
+		),
 		error: null
 	};
 };
 
-const replyWithFirstQuestion = (questions: Array<string>) => {
+const replyWithFirstQuestion = (questions: Array<ColumnMetadata>) => {
 	if (!questions.length || questions.length < 1) {
 		return util._404('No Questions Found');
 	}
 
-	return util._200(questions[0]);
+	return util._200(questions[0].columnDesc);
 };
 
 const resetConversation = async (twilioData: MessagingWebhookBody) => {
@@ -163,7 +143,7 @@ const getExistingSession = async (twilioData: MessagingWebhookBody) => {
 
 const updateExistingSession = async (
 	existingSession: { _id: string },
-	questionsRemaining: Array<string>,
+	questionsRemaining: Array<ColumnMetadata>,
 	twilioData: MessagingWebhookBody
 ) => {
 	return await updateByRowId(
@@ -173,7 +153,7 @@ const updateExistingSession = async (
 					{
 						rowId: existingSession._id,
 						columns: {
-							[questionsRemaining[0]]: twilioData.Body,
+							[questionsRemaining[0].columnName]: twilioData.Body,
 							Complete: `${questionsRemaining.length <= 1}`
 						}
 					}
@@ -221,8 +201,8 @@ const conversation = async (event: APIGatewayEventWithCookies): Promise<HTTPResp
 	}
 
 	// 5. Calculate Next Question to Ask
-	const questionsRemaining: Array<string> = questions.filter(
-		(question: string) => !existingSession.rows[0][question]
+	const questionsRemaining: Array<ColumnMetadata> = questions.filter(
+		(question: ColumnMetadata) => !existingSession.rows[0][question.columnName]
 	);
 
 	if (questionsRemaining.length < 1) {
@@ -241,7 +221,16 @@ const conversation = async (event: APIGatewayEventWithCookies): Promise<HTTPResp
 
 	// 5. Else If Session Ended — Alert Queue & Update Grid
 	if (questionsRemaining.length === 1) {
-		await sendToSQS(COMPLETED_QUEUE_URL ?? '', JSON.stringify(twilioData));
+		await sendToSQS(
+			COMPLETED_QUEUE_URL ?? '',
+			JSON.stringify({
+				twilioData,
+				existingSession: {
+					...existingSession.rows[0],
+					[questionsRemaining[0].columnName]: twilioData.Body
+				}
+			})
+		);
 	}
 
 	questionsRemaining.shift();

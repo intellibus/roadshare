@@ -36,6 +36,7 @@
 			"@/common/*": ["src/common/*"],
 			"@/functions/*": ["src/functions/*"],
 			"@/grids/*": ["../grids/*"],
+			"@/types/*": ["../types/*"],
 			"@/util/*": ["util/*"]
 		}
 	},

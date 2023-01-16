@@ -20,7 +20,8 @@ const {
 	TERRAFORM_BACKEND_BUCKET,
 	TWILIO_SID,
 	TWILIO_AUTH,
-	TWILIO_PHONE_NUMBER
+	TWILIO_PHONE_NUMBER,
+	GEOCODING_API_KEY
 } = process.env;
 
 const getFunctionConfig = (
@@ -41,6 +42,7 @@ const getFunctionConfig = (
 			TWILIO_SID: TWILIO_SID!,
 			TWILIO_AUTH: TWILIO_AUTH!,
 			TWILIO_PHONE_NUMBER: TWILIO_PHONE_NUMBER!,
+			GEOCODING_API_KEY: GEOCODING_API_KEY!,
 			...envVars
 		},
 		memorySize: 2048,

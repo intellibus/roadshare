@@ -20,14 +20,16 @@
 	"dependencies": {
 		"@aws-sdk/client-sqs": "^3.245.0",
 		"@cdktf/provider-aws": "^11.0.10",
-		"bigparser": "^0.8.1",
+		"bigparser": "^0.8.2",
 		"cdktf": "^0.14.3",
 		"constructs": "^10.1.220",
 		"esbuild": "^0.14.28",
 		"glob": "^7.2.0",
 		"lambda-log": "^3.1.0",
 		"lodash": "^4.17.21",
+		"node-fetch": "^3.3.0",
 		"twilio": "^3.84.0",
+		"uuid": "^9.0.0",
 		"xrays": "^1.0.229"
 	},
 	"devDependencies": {
@@ -39,6 +41,7 @@
 		"@types/lambda-log": "^2.2.1",
 		"@types/lodash": "^4.14.191",
 		"@types/node": "18.11.18",
+		"@types/uuid": "^9.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.48.1",
 		"@typescript-eslint/parser": "^5.48.1",
 		"commitizen": "^4.2.6",
