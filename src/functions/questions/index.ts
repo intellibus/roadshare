@@ -164,7 +164,7 @@ const updateExistingSession = async (
 	);
 };
 
-const conversation = async (event: APIGatewayEventWithCookies): Promise<HTTPResponse> => {
+const questions = async (event: APIGatewayEventWithCookies): Promise<HTTPResponse> => {
 	if (!event.body) {
 		return util._500('Missing Form Encoded Body');
 	}
@@ -240,7 +240,7 @@ const conversation = async (event: APIGatewayEventWithCookies): Promise<HTTPResp
 };
 
 export async function main(input: APIGatewayEventWithCookies) {
-	const runnable = await eventsJson(conversation);
+	const runnable = await eventsJson(questions);
 	const response = await runnable(input);
 	return response;
 }

@@ -20,7 +20,7 @@ const sendMessage = async (to: string, body: string) => {
 	});
 };
 
-const conversation = async (event: SQSEvent): Promise<void> => {
+const matching = async (event: SQSEvent): Promise<void> => {
 	const sqsBody: { existingSession: QuestionsGridModel; twilioData: MessagingWebhookBody } =
 		JSON.parse(event.Records[0].body);
 
@@ -31,7 +31,7 @@ const conversation = async (event: SQSEvent): Promise<void> => {
 };
 
 export async function main(input: SQSEvent) {
-	const runnable = await eventsJson(conversation);
+	const runnable = await eventsJson(matching);
 	const response = await runnable(input);
 	return response;
 }
