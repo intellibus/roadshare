@@ -1,0 +1,38 @@
+name: Deploy Sites
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  deploy:
+    name: Deploy all Sites from Sites.grid
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: pnpm Setup
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7.1.0
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+      - name: Install Dependencies
+        run: pnpm install
+        id: deployInstall
+      - name: Setup Environment
+        run: echo $ENV_FILE | base64 --decode > .env
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+      - name: Generate Module and Provider Bindings
+        run: pnpm dlx cdktf-cli get
+      - name: Synthesize Infrastructure
+        run: pnpm dlx cdktf-cli synth
+      - name: Deploy Infrastructure
+        run: pnpm dlx cdktf-cli deploy --auto-approve

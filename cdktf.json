@@ -1,0 +1,24 @@
+{
+	"language": "typescript",
+	"app": "pnpm exec ts-node-esm --experimental-specifier-resolution=node -r dotenv/config terraform/main.ts",
+	"projectId": "60b7d778-7382-4220-a6a4-7b906e8cf234",
+	"sendCrashReports": "false",
+	"terraformProviders": [],
+	"terraformModules": [
+		{ "name": "lambda", "source": "terraform-aws-modules/lambda/aws", "version": "~> 4.7.2" },
+		{
+			"name": "apigateway-v2",
+			"source": "terraform-aws-modules/apigateway-v2/aws",
+			"version": "~> 2.2.1"
+		},
+		{
+			"name": "sqs",
+			"source": "terraform-aws-modules/sqs/aws",
+			"version": "~> 4.0.0"
+		}
+	],
+	"context": {
+		"excludeStackIdFromLogicalIds": "true",
+		"allowSepCharsInLogicalIds": "true"
+	}
+}
