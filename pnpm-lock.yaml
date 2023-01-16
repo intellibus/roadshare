@@ -13,7 +13,7 @@ specifiers:
   '@types/node': 18.11.18
   '@typescript-eslint/eslint-plugin': ^5.48.1
   '@typescript-eslint/parser': ^5.48.1
-  bigparser: ^0.7.4
+  bigparser: ^0.8.1
   cdktf: ^0.14.3
   commitizen: ^4.2.6
   constructs: ^10.1.220
@@ -34,7 +34,7 @@ specifiers:
 dependencies:
   '@aws-sdk/client-sqs': 3.245.0
   '@cdktf/provider-aws': 11.0.10_lyr3d6yjbvgl6fnjbmt7rrowzm
-  bigparser: 0.7.4
+  bigparser: 0.8.1
   cdktf: 0.14.3_constructs@10.1.220
   constructs: 10.1.220
   esbuild: 0.14.54
@@ -1409,8 +1409,8 @@ packages:
   /base64-js/1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
-  /bigparser/0.7.4:
-    resolution: {integrity: sha512-8p+8fCojH4jbgiV/6pVJecAefFZ8/pl8Y4ojY3KLM9hR3Z4KnF8hWUSCzeFQwH3upw/1DgkPl0GXbz47kNmidg==}
+  /bigparser/0.8.1:
+    resolution: {integrity: sha512-s1YJmK9BJSfdVEaXdRs3dDHoVt2tnuA9UycU/27L+PFPEV210FDOmKqyELN80C/luOJBUfvfVYtDIqdnerboOQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
       axios: 1.2.2
