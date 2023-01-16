@@ -2,9 +2,9 @@ import { SQSEvent } from 'aws-lambda';
 import { eventsJson } from 'common/middleware';
 import twilio from 'twilio';
 
-const { TWILIO_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER, MATCHING_GRID_ID } = process.env;
+const { TWILIO_SID, TWILIO_AUTH, TWILIO_PHONE_NUMBER, MATCHING_GRID_ID } = process.env;
 
-const client = twilio(TWILIO_SID, TWILIO_AUTH_TOKEN);
+const client = twilio(TWILIO_SID, TWILIO_AUTH);
 
 const conversation = async (event: SQSEvent): Promise<void> => {
 	const sqsBody = JSON.parse(event.Records[0].body);
