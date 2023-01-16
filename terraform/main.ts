@@ -1,8 +1,9 @@
 import { Construct } from 'constructs';
-import { App, S3Backend, TerraformStack } from 'cdktf';
+import { App, S3Backend, TerraformOutput, TerraformStack } from 'cdktf';
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
 import { DataAwsCallerIdentity } from '@cdktf/provider-aws/lib/data-aws-caller-identity';
 import { LambdaPermission } from '@cdktf/provider-aws/lib/lambda-permission';
+import { LambdaEventSourceMapping } from '@cdktf/provider-aws/lib/lambda-event-source-mapping';
 
 import { Lambda } from '../.gen/modules/lambda';
 import { ApigatewayV2 } from '../.gen/modules/apigateway-v2';
@@ -30,7 +31,7 @@ const getFunctionConfig = (
 ) => {
 	return {
 		functionName: `roadshare-${name}-function-${ENVIRONMENT}`,
-		sourcePath: `../dist/${name}`,
+		sourcePath: `../../../dist/${name}`,
 		runtime: 'nodejs16.x',
 		handler: 'index.main',
 		environmentVariables: {
@@ -43,7 +44,7 @@ const getFunctionConfig = (
 			...envVars
 		},
 		memorySize: 2048,
-		timeout: 60,
+		timeout: 20,
 		attachPolicyStatements: true,
 		policyStatements: {
 			create_logs: {
@@ -116,7 +117,7 @@ class RoadshareDeployment extends TerraformStack {
 			)
 		);
 
-		new Lambda(
+		const matchingFunction = new Lambda(
 			this,
 			`roadshare-matching-function-${ENVIRONMENT}`,
 			getFunctionConfig(
@@ -136,6 +137,8 @@ class RoadshareDeployment extends TerraformStack {
 		const apiGateway = new ApigatewayV2(this, `roadshare-api-gateway-${ENVIRONMENT}`, {
 			name: `roadshare-api-gateway-${ENVIRONMENT}`,
 			description: 'HTTP API Gateway exposed to Twilio',
+			protocolType: 'HTTP',
+			createApiDomainName: false,
 			corsConfiguration: {
 				allowHeaders: [
 					'content-type',
@@ -149,10 +152,10 @@ class RoadshareDeployment extends TerraformStack {
 				allowOrigins: ['*']
 			},
 			integrations: {
-				'POST /sms': {
-					lambdaArn: questionsLambda.lambdaFunctionArnOutput,
+				'POST /': {
+					lambda_arn: questionsLambda.lambdaFunctionArnOutput,
 					payloadFormatVersion: '2.0',
-					timeoutMilliseconds: 20000
+					timeout_milliseconds: 20000
 				}
 			},
 			tags: {
@@ -168,6 +171,15 @@ class RoadshareDeployment extends TerraformStack {
 			functionName: questionsLambda.lambdaFunctionNameOutput,
 			principal: 'apigateway.amazonaws.com',
 			sourceArn: `${apiGateway.apigatewayv2ApiExecutionArnOutput}/*/*/*`
+		});
+
+		new LambdaEventSourceMapping(this, `roadshare-complete-event-source-mapping-${ENVIRONMENT}`, {
+			eventSourceArn: completedQueue.queueArnOutput,
+			functionName: matchingFunction.lambdaFunctionArnOutput
+		});
+
+		new TerraformOutput(this, `roadshare-api-gateway-url-output-${ENVIRONMENT}`, {
+			value: apiGateway.defaultApigatewayv2StageInvokeUrlOutput
 		});
 	}
 }

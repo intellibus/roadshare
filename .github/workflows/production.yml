@@ -30,6 +30,8 @@ jobs:
         run: echo $ENV_FILE | base64 --decode > .env
         env:
           ENV_FILE: ${{ secrets.ENV_FILE }}
+      - name: Build Functions
+        run: pnpm run build
       - name: Generate Module and Provider Bindings
         run: pnpm dlx cdktf-cli get
       - name: Synthesize Infrastructure
