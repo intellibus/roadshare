@@ -26,15 +26,15 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
         id: deployInstall
-      - name: Setup Environment
-        run: echo $ENV_FILE | base64 --decode > .env
-        env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
-      - name: Build Functions
-        run: pnpm run build
-      - name: Generate Module and Provider Bindings
-        run: pnpm dlx cdktf-cli get
-      - name: Synthesize Infrastructure
-        run: pnpm dlx cdktf-cli synth
-      - name: Deploy Infrastructure
-        run: pnpm dlx cdktf-cli deploy --auto-approve
+      # - name: Setup Environment
+      #   run: echo $ENV_FILE | base64 --decode > .env
+      #   env:
+      #     ENV_FILE: ${{ secrets.ENV_FILE }}
+      # - name: Build Functions
+      #   run: pnpm run build
+      # - name: Generate Module and Provider Bindings
+      #   run: pnpm dlx cdktf-cli get
+      # - name: Synthesize Infrastructure
+      #   run: pnpm dlx cdktf-cli synth
+      # - name: Deploy Infrastructure
+      #   run: pnpm dlx cdktf-cli deploy --auto-approve
