@@ -121,12 +121,13 @@ const sendMessagesToAllMatches = async (
 	const messagePromises = rideshareMatches.map(async (match: MatchesGridModel) => {
 		return await sendMessage(
 			match['Phone #'],
-			`Hi ${match['Name']}! We found a match for you! Meet ${rideshareMatches
-				.filter(
+			`Hi ${match['Name']}! We found a match for you! Meet ${[
+				...rideshareMatches.filter(
 					(others: MatchesGridModel) =>
 						!(others['Phone #'] === match['Phone #'] && others['Name'] === match['Name'])
-				)
-				.push({ Name: existingSession['Name'] })
+				),
+				{ Name: existingSession['Name'] }
+			]
 				.map((others: MatchesGridModel) => others['Name'].trim())
 				.join(', ')} @ ${pickup}`
 		);
