@@ -15,6 +15,11 @@ const conversation = async (event: SQSEvent): Promise<void> => {
 		to: sqsBody.From
 	});
 
+	// Geocoding Parse for Lat / Long
+	// Search for Existing Matching in Grid
+	// Update Existing Row if Matches have been found
+	// Create a New Request Row if not Matches
+
 	return;
 };
 

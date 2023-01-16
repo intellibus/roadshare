@@ -6,7 +6,7 @@ export const runFunction = async (
 	handler: (event: any) => Promise<any | void>,
 	input: any
 ): Promise<any | void> => {
-	log.debug('Function Input', input);
+	log.info('Function Input', input);
 	const response = await handler(input);
 	return response;
 };
